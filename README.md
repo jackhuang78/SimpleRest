@@ -6,7 +6,7 @@ This project use [Gradle](https://gradle.org/) to manage dependencies and build 
 
 Either download the project as a zip file and unzip it, or clone the repository to your machine. Navigate to the root directory of the project, then execute
      
-    gradle run
+    > gradle run
 
 Gradle will download all needed dependencies, build the project, then run it. An HTTP server will be running on localhost:9090. To verify that the server is running, execute
 
