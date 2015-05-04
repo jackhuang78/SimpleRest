@@ -2,17 +2,18 @@
 A simple [REST](http://en.wikipedia.org/wiki/Representational_state_transfer) service built in Java with [Jetty](http://eclipse.org/jetty/), [Resteasy](http://resteasy.jboss.org/), and [Java Collections](http://docs.oracle.com/javase/8/docs/api/java/util/package-summary.html).
 
 ## Setup ##
-This project use [Gradle](https://gradle.org/) to manage dependencies and build process.
+This project use [Gradle](https://gradle.org/) to manage dependencies and build process. Please install Gradle first.
 
-To build the project, execute at the root directory:
-    
-    gradle build
-
-To run the project, execute at the root directory:
+Either download the project as a zip file and unzip it, or clone the repository to your machine. Navigate to the root directory of the project, then execute
      
     gradle run
 
-Then, an HTTP server will be running on localhost:9090.
+Gradle will download all needed dependencies, build the project, then run it. An HTTP server will be running on localhost:9090. To verify that the server is running, execute
+
+    > curl -XGET localhost:9090/rest
+    SimpleRestDb
+
+
 
 ## REST API ##
 
