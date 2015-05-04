@@ -216,7 +216,7 @@ public class Rest implements ExceptionMapper<Exception> {
 	 * Catches all errors and returns proper response.
 	 */
 	public Response toResponse(Exception e) {
-		log.warn("Exception", e);
+		
 
     	if(e instanceof WebApplicationException) {
     		WebApplicationException webEx = (WebApplicationException) e;
@@ -238,6 +238,7 @@ public class Rest implements ExceptionMapper<Exception> {
     				return response(status, TEXT_PLAIN_TYPE, null, "Method %s not allowed on this URL.", m.group(1));
     			
     		default:
+    			log.warn("Exception", e);
     			return response(status, TEXT_PLAIN_TYPE, webEx, "");
     			
     		}
@@ -258,6 +259,7 @@ public class Rest implements ExceptionMapper<Exception> {
     		return response(Status.BAD_REQUEST, TEXT_PLAIN_TYPE, null, "Item has invalid id: %s.", e.getMessage());
     		
     	} else {
+    		log.warn("Exception", e);
     		return response(INTERNAL_SERVER_ERROR, TEXT_PLAIN_TYPE, e, "Internal server error.");
     	}
     	
