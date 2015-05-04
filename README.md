@@ -6,11 +6,11 @@ This project use [Gradle](https://gradle.org/) to manage dependencies and build 
 
 To build the project, execute at the root directory:
     
-     gradle build
+    gradle build
 
 To run the project, execute at the root directory:
      
-     gradle run
+    gradle run
 
 Then, an HTTP server will be running on localhost:9090.
 
