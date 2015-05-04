@@ -1,6 +1,11 @@
 # SimpleRest #
 A simple [REST](http://en.wikipedia.org/wiki/Representational_state_transfer) service built in Java with [Jetty](http://eclipse.org/jetty/), [Resteasy](http://resteasy.jboss.org/), and [Java Collections](http://docs.oracle.com/javase/8/docs/api/java/util/package-summary.html).
 
+## Purpose ##
+I just thought it would be cool to build a minimal yet full-functioning REST service. It uses embedded Jetty as the servlet engine, a data store built out of native java classes, and persistence through file serialization. 
+
+If you application plans to access some sort of database with REST API but you don't want to go through the trouble setting it yet, you can use this service as a proxy instead.
+
 ## Setup ##
 This project use [Gradle](https://gradle.org/) to manage dependencies and build process. Please install Gradle first.
 
