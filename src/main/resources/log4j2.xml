@@ -4,7 +4,7 @@
 		<Console name="Console" target="SYSTEM_OUT">
 			<PatternLayout pattern="[%t] %-5level (%F:%L) %c{1}.%M - %msg%n"/>
 		</Console>
-		<RollingFile name="RollingFile" fileName="logs/simplerest.log"
+		<RollingFile name="RollingFile" fileName="log/simplerest.log"
 					filePattern="log/$${date:yyyy-MM}/sql4j-%d{MM-dd-yyyy}-%i.log.gz">
 			<PatternLayout pattern="%-5level %d{DEFAULT} [%t] %c.%M (%F:%L) - %msg%n" />
 			<Policies>
