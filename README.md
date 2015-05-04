@@ -12,7 +12,7 @@ To run the project, execute at the root directory:
      
      gradle run
 
-Then, an HTTP server will be running on localhost:8080.
+Then, an HTTP server will be running on localhost:9090.
 
 ## REST API ##
 
@@ -25,3 +25,42 @@ GET    | /rest/<collection>      | Read all items in a collection
 PUT    | /rest/<collection>/<id> | Update an item in a collection
 DELETE | /rest/<collection>/<id> | Delete an item from a collection
 DELETE | /rest/<collection>      | Delete all items in a collection
+
+## Example ##
+Create a few student records.
+
+    > curl -XPOST -d "{\"name\": \"John\"}" localhost:9090/rest/students
+    1
+
+    > curl -XPOST -d "{\"name\": \"Adam\"}" localhost:9090/rest/students
+    2
+
+Read records
+
+    > curl -XGET localhost:9090/rest/students/1
+    {"_id":1,"name":"John"}
+
+    > curl -XGET localhost:9090/rest/students/2
+    {"_id":2,"name":"Adam"}
+
+    > curl -XGET localhost:9090/rest/students
+    [{"_id":1,"name":"John"},{"_id":2,"name":"Adam"}]
+
+Update records
+
+    > curl -XPUT -d "{\"name\": \"Adam Smith\", \"age\": 238}" localhost:9090/rest/students/2
+
+    > curl -XGET localhost:9090/rest/students/2
+    {"_id":2,"name":"Adam Smith","age":238}
+
+Delete records
+
+    > curl -XDELETE localhost:9090/rest/students/1
+    
+    > curl -XGET localhost:9090/rest/students/1
+    Item students[1] does not exist.
+
+    > curl -XDELETE localhost:9090/rest/students
+
+    > curl -XGET localhost:9090/rest/students
+    []
