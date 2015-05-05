@@ -17,23 +17,21 @@ Gradle will download all needed dependencies, build the project, then run it. An
     > curl -XGET localhost:9090/rest
     SimpleRestDb
 
-
-
 ## REST API ##
 
-Method | URL Format              | Description
--------|-------------------------|-------------
-HEAD   | /rest/<collection>/<id> | Test whether an item exists in a collection
-POST   | /rest/<collection>      | Crean an item in a collection
-GET    | /rest/<collection>/<id> | Read an item from a collection
-GET    | /rest/<collection>      | Read all items in a collection
-PUT    | /rest/<collection>/<id> | Update an item in a collection
-DELETE | /rest/<collection>/<id> | Delete an item from a collection
-DELETE | /rest/<collection>      | Delete all items in a collection
+Method | URL Format              | Description                                 | Request Body | Response Body
+-------|-------------------------|---------------------------------------------|--------------|--------------
+HEAD   | /rest/<collection>/<id> | Test whether an item exists in a collection | *none*       | *none*
+POST   | /rest/<collection>      | Crean an item in a collection               | JSON object  | ID
+GET    | /rest/<collection>/<id> | Read an item from a collection              | *none*       | JSON object
+GET    | /rest/<collection>      | Read all items in a collection              | *none*       | JSON array
+PUT    | /rest/<collection>/<id> | Update an item in a collection              | JSON object  | *none*
+DELETE | /rest/<collection>/<id> | Delete an item from a collection            | *none*       | *none*
+DELETE | /rest/<collection>      | Delete all items in a collection            | *none*       | *none*
 
-Items are given and returned in JSON format.
+Items are given and returned in the body in [JSON](http://www.json.org/) format. Anything you can write in JSON format can be saved to and retrieved from this service. 
 
-## Example ##
+## Usage Example ##
 Create a few student records.
 
     > curl -XPOST -d "{\"name\": \"John\"}" localhost:9090/rest/students
@@ -71,3 +69,6 @@ Delete records
 
     > curl -XGET localhost:9090/rest/students
     []
+
+## Deployment to Other Servlet Containers ##
+Simple copy `SimpleRest.war` under `build/libs` into your choice of servlet containers (e.g Tomcat). If you don't find the WAR file, execute `gradle build`.
