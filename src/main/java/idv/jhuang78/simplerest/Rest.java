@@ -34,6 +34,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -71,12 +72,12 @@ public class Rest implements ExceptionMapper<Exception> {
 		log.info("HTTP request GET /rest.");
 		
 		StringBuffer sb = new StringBuffer();
-		sb.append("SimpleRestDb\n");
+		sb.append("SimpleRest\n");
 		for(String collectionName : db.keySet()) {
 			sb.append("\t" + collectionName + ": " + db.get(collectionName).size() + "\n");
 		}
 		
-		return response(OK, TEXT_PLAIN_TYPE, null, "%s", sb.toString());
+		return response(OK, TEXT_PLAIN_TYPE, null, "%s\n", sb.toString());
 	}
 	
 	/**
@@ -96,7 +97,7 @@ public class Rest implements ExceptionMapper<Exception> {
 		Item item = mapper.readValue(itemJson, Item.class);
 		int id = collection.add(item);
 		
-		return response(CREATED, TEXT_PLAIN_TYPE, null, "%d", id);
+		return response(CREATED, TEXT_PLAIN_TYPE, null, "%d\n", id);
 	}
 	
 	/**
@@ -123,7 +124,7 @@ public class Rest implements ExceptionMapper<Exception> {
 		List<Item> items = new ArrayList<>(collection.values());
 		String itemsJson = mapper.writeValueAsString(items);
 		
-		return response(OK, APPLICATION_JSON_TYPE, null, "%s", itemsJson);
+		return response(OK, APPLICATION_JSON_TYPE, null, "%s\n", itemsJson);
 	}
 	
 	@GET @Path("/{collection}/{id}")
@@ -139,7 +140,7 @@ public class Rest implements ExceptionMapper<Exception> {
 		Item item = collection.get(id);
 		String itemJson = mapper.writeValueAsString(item);
 		
-		return response(OK, APPLICATION_JSON_TYPE, null, "%s", itemJson);
+		return response(OK, APPLICATION_JSON_TYPE, null, "%s\n", itemJson);
 		
 	}
 	
@@ -196,13 +197,27 @@ public class Rest implements ExceptionMapper<Exception> {
 	
 	
 	private Response response(Status status, MediaType type, Throwable error, String format, Object... args) {
-		log.info("HTTP response {} {}.", status.getStatusCode(), status.getReasonPhrase());
+		
+		String ansiBegin = "";
+		String ansiReset = "\u001B[0m";
+		switch(status.getFamily()) {
+		case INFORMATIONAL: case SUCCESSFUL: 
+			ansiBegin = "\u001B[32m"; break;
+			
+		case REDIRECTION: case OTHER:
+			ansiBegin = "\u001B[36m"; break;
+			
+		case CLIENT_ERROR: case SERVER_ERROR: 
+			ansiBegin = "\u001B[31m"; break;
+		}
+		
+		log.info("HTTP response {}{}{} {}.", ansiBegin, status.getStatusCode(), ansiReset, status.getReasonPhrase());
 		
 		String message = String.format(format, args);
 		if(error != null) {
 			StringWriter writer = new StringWriter();
 			error.printStackTrace(new PrintWriter(writer));
-			message += "\n\n" + writer.toString();
+			message += "\n" + writer.toString();
 		}
 		
 		return Response.status(status).type(type).entity(message).build();		
@@ -229,13 +244,13 @@ public class Rest implements ExceptionMapper<Exception> {
     			p = Pattern.compile("javax\\.ws\\.rs\\.NotFoundException\\: Could not find resource for full path: ([\\w+\\:/]*)");
     			m = p.matcher(webEx.toString());
     			if(m.matches())
-    				return response(status, TEXT_PLAIN_TYPE, null, "Invalid URL %s.", m.group(1));
+    				return response(status, TEXT_PLAIN_TYPE, null, "Invalid URL %s.\n", m.group(1));
 
     		case METHOD_NOT_ALLOWED:
     			p = Pattern.compile("javax\\.ws\\.rs\\.NotAllowedException\\: No resource method found for (\\w+)\\, return 405 with Allow header");
     			m = p.matcher(webEx.toString());
     			if(m.matches())
-    				return response(status, TEXT_PLAIN_TYPE, null, "Method %s not allowed on this URL.", m.group(1));
+    				return response(status, TEXT_PLAIN_TYPE, null, "Method %s not allowed on this URL.\n", m.group(1));
     			
     		default:
     			log.warn("Exception", e);
@@ -244,19 +259,19 @@ public class Rest implements ExceptionMapper<Exception> {
     		}
     		
     	} else if(e instanceof NotImplementedYetException) {
-    		return response(NOT_IMPLEMENTED, TEXT_PLAIN_TYPE, null, "Method not implemented yet: %s.", e.getMessage());
+    		return response(NOT_IMPLEMENTED, TEXT_PLAIN_TYPE, null, "Method not implemented yet: %s.\n", e.getMessage());
     	
     	} else if(e instanceof JsonParseException || e instanceof JsonMappingException) {
-    		return response(Status.BAD_REQUEST, TEXT_PLAIN_TYPE, null, "Bad format for request JSON: %s.", e.getMessage());
+    		return response(Status.BAD_REQUEST, TEXT_PLAIN_TYPE, null, "Bad format for request JSON: %s.\n", e.getMessage());
     		
     	} else if(e instanceof ItemAlreadyExistException) {
-    		return response(Status.CONFLICT, TEXT_PLAIN_TYPE, null, "Item %s already exists.", e.getMessage());
+    		return response(Status.CONFLICT, TEXT_PLAIN_TYPE, null, "Item %s already exists.\n", e.getMessage());
     		
     	} else if(e instanceof ItemNotFoundException) {
-    		return response(Status.NOT_FOUND, TEXT_PLAIN_TYPE, null, "Item %s does not exist.", e.getMessage());
+    		return response(Status.NOT_FOUND, TEXT_PLAIN_TYPE, null, "Item %s does not exist.\n", e.getMessage());
     	
     	} else if(e instanceof InvalidIdException) {
-    		return response(Status.BAD_REQUEST, TEXT_PLAIN_TYPE, null, "Item has invalid id: %s.", e.getMessage());
+    		return response(Status.BAD_REQUEST, TEXT_PLAIN_TYPE, null, "Item has invalid id: %s.\n", e.getMessage());
     		
     	} else {
     		log.warn("Exception", e);
