@@ -13,6 +13,7 @@ import idv.jhuang78.simplerest.exception.InvalidIdException;
 import idv.jhuang78.simplerest.exception.ItemAlreadyExistException;
 import idv.jhuang78.simplerest.exception.ItemNotFoundException;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -23,7 +24,6 @@ import java.util.regex.Pattern;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -34,7 +34,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
@@ -48,16 +47,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/**
- *
- *	POST /<collection> - add an item to a collection
- *	GET /<collection>/<id> - get a specific item from a collection
- *	GET /<collection> - get all items from a collection
- *	PUT /<collection>/<id> - update a specific item in a collection
- *	DELETE /<collection>/<id> - delete a specific item from a collection
- *	DELETE /<collection> - delete all collections in a collection
- *
- */
 @Provider 
 @Path("/rest")
 public class Rest implements ExceptionMapper<Exception> {
@@ -96,6 +85,7 @@ public class Rest implements ExceptionMapper<Exception> {
 		Collection collection = db.getCollection(collectionName, true);
 		Item item = mapper.readValue(itemJson, Item.class);
 		int id = collection.add(item);
+		db.commit();
 		
 		return response(CREATED, TEXT_PLAIN_TYPE, null, "%d\n", id);
 	}
@@ -124,6 +114,7 @@ public class Rest implements ExceptionMapper<Exception> {
 		List<Item> items = new ArrayList<>(collection.values());
 		String itemsJson = mapper.writeValueAsString(items);
 		
+		
 		return response(OK, APPLICATION_JSON_TYPE, null, "%s\n", itemsJson);
 	}
 	
@@ -138,7 +129,10 @@ public class Rest implements ExceptionMapper<Exception> {
 			throw new ItemNotFoundException(String.format("%s[%d]", collectionName, id));
 		
 		Item item = collection.get(id);
+		
+		
 		String itemJson = mapper.writeValueAsString(item);
+		
 		
 		return response(OK, APPLICATION_JSON_TYPE, null, "%s\n", itemJson);
 		
@@ -166,16 +160,17 @@ public class Rest implements ExceptionMapper<Exception> {
 		
 		Item item = (Item) mapper.readValue(itemJson, Item.class);
 		collection.add(id, item);
+		db.commit();
 		
 		return response(NO_CONTENT, TEXT_PLAIN_TYPE, null, "");
 	}
 	
 	@DELETE @Path("/{collection}")
 	public Response delete(@Context Database db,
-			@PathParam("collection") String collectionName) {
+			@PathParam("collection") String collectionName) throws Exception {
 		log.info("HTTP request DELETE /rest/{}.", collectionName);
 		db.remove(collectionName);
-		
+		db.commit();
 		return response(NO_CONTENT, TEXT_PLAIN_TYPE, null, "");
 		
 	}
@@ -183,7 +178,7 @@ public class Rest implements ExceptionMapper<Exception> {
 	@DELETE @Path("/{collection}/{id}")
 	public Response delete(@Context Database db,
 			@PathParam("collection") String collectionName,
-			@PathParam("id") int id) {
+			@PathParam("id") int id) throws Exception {
 		log.info("HTTP request DELETE /rest/{}/{}.", collectionName, id);
 		
 		Collection collection = db.getCollection(collectionName, false);
@@ -192,6 +187,8 @@ public class Rest implements ExceptionMapper<Exception> {
 			throw new ItemNotFoundException("%s[%d]", collectionName, id);
 		
 		collection.remove(id);
+		db.commit();
+		
 		return response(NO_CONTENT, TEXT_PLAIN_TYPE, null, "");
 	}
 	
@@ -205,7 +202,7 @@ public class Rest implements ExceptionMapper<Exception> {
 			ansiBegin = "\u001B[32m"; break;
 			
 		case REDIRECTION: case OTHER:
-			ansiBegin = "\u001B[36m"; break;
+			ansiBegin = "\u001B[33m"; break;
 			
 		case CLIENT_ERROR: case SERVER_ERROR: 
 			ansiBegin = "\u001B[31m"; break;
@@ -272,6 +269,11 @@ public class Rest implements ExceptionMapper<Exception> {
     	
     	} else if(e instanceof InvalidIdException) {
     		return response(Status.BAD_REQUEST, TEXT_PLAIN_TYPE, null, "Item has invalid id: %s.\n", e.getMessage());
+    		
+    	} else if(e instanceof IOException) {
+    		log.error("Failed to write database to file.", e);
+    		return response(INTERNAL_SERVER_ERROR, TEXT_PLAIN_TYPE, null, "Server failed to persist database changes. Please check server log for more information.\n");
+    		
     		
     	} else {
     		log.warn("Exception", e);

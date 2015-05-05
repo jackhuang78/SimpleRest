@@ -61,12 +61,13 @@ public class Config extends Application {
 			log.fatal(String.format("Failed to load database from %s. Terminating...", dbPath), e);
 			System.exit(1);
 		}
-			
+		
+		db.setPath(dbPath);
 		
 		dispatcher.getDefaultContextObjects().put(Database.class, db);
 	
 		
-		final int backupInterval = Integer.parseInt(config.getProperty("srdb.db.backup.interval", "60000"));
+		/*final int backupInterval = Integer.parseInt(config.getProperty("srdb.db.backup.interval", "60000"));
 		new Thread(){
 			public @Override void run() {
 				try {
@@ -81,19 +82,8 @@ public class Config extends Application {
 					log.error("Error backing up database. Stop backup.", e);
 				}
 			}
-		}.start();
+		}.start();*/
 	}
 	
-	@PostConstruct
-	public void post() {
-		log.fatal("STARTED!!!");
-	}
-	
-	@PreDestroy
-	public void destory() {
-		log.fatal("DESTORY!!!");
-	}
-	
-	
-        
+	        
 }

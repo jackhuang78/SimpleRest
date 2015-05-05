@@ -2,8 +2,11 @@ package idv.jhuang78.simplerest;
 
 import idv.jhuang78.simplerest.Database.Collection;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
@@ -12,8 +15,21 @@ import java.util.TreeMap;
 public class Database extends HashMap<String, Collection> {
 	private static final long serialVersionUID = 1L;
 
+	private String path;
+	
 	public Database() {
 		super();
+		
+	}
+	public void setPath(String path) {
+		this.path = path;
+	}
+	
+	
+	public void commit() throws IOException {
+		try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path))) {
+			out.writeObject(this);
+		} 
 	}
 	
 	
