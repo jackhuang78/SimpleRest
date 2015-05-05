@@ -31,6 +31,8 @@ PUT    | /rest/<collection>/<id> | Update an item in a collection
 DELETE | /rest/<collection>/<id> | Delete an item from a collection
 DELETE | /rest/<collection>      | Delete all items in a collection
 
+Items are given and returned in JSON format.
+
 ## Example ##
 Create a few student records.
 
