@@ -19,15 +19,15 @@ Gradle will download all needed dependencies, build the project, then run it. An
 
 ## REST API ##
 
-Method | URL Format              | Description                                 | Request Body | Response Body
--------|-------------------------|---------------------------------------------|--------------|--------------
-HEAD   | /rest/<collection>/<id> | Test whether an item exists in a collection | *none*       | *none*
-POST   | /rest/<collection>      | Crean an item in a collection               | JSON object  | ID
-GET    | /rest/<collection>/<id> | Read an item from a collection              | *none*       | JSON object
-GET    | /rest/<collection>      | Read all items in a collection              | *none*       | JSON array
-PUT    | /rest/<collection>/<id> | Update an item in a collection              | JSON object  | *none*
-DELETE | /rest/<collection>/<id> | Delete an item from a collection            | *none*       | *none*
-DELETE | /rest/<collection>      | Delete all items in a collection            | *none*       | *none*
+Method | URL Format              | Description                            | Request Body | Response Body
+-------|-------------------------|----------------------------------------|--------------|--------------
+HEAD   | /rest/<collection>/<id> | Test if an item exists in a collection | *none*       | *none*
+POST   | /rest/<collection>      | Crean an item in a collection          | JSON object  | ID
+GET    | /rest/<collection>/<id> | Read an item from a collection         | *none*       | JSON object
+GET    | /rest/<collection>      | Read all items in a collection         | *none*       | JSON array
+PUT    | /rest/<collection>/<id> | Update an item in a collection         | JSON object  | *none*
+DELETE | /rest/<collection>/<id> | Delete an item from a collection       | *none*       | *none*
+DELETE | /rest/<collection>      | Delete all items in a collection       | *none*       | *none*
 
 Items are given and returned in the body in [JSON](http://www.json.org/) format. Anything you can write in JSON format can be saved to and retrieved from this service. 
 
