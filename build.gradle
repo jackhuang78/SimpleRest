@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'application'
+apply plugin: 'war'
 
 sourceCompatibility = 1.8
 version = '1.0'
@@ -40,5 +41,14 @@ uploadArchives {
     }
 }
 
+// run as application
+// gradle run
 mainClassName = "idv.jhuang78.simplerest.Jetty"
+
+// build as war
+// gradle war
+war {
+	webXml = file('src/main/resources/web.xml')
+	archiveName = 'SimpleRest.war'
+}
 
