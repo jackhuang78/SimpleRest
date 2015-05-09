@@ -80,3 +80,6 @@ Delete records
 
 ## Deployment with WAR ##
 Simply copy `SimpleRest.war` under `build/libs` into your choice of servlet containers (e.g Tomcat). If you don't find the WAR file, execute `gradle build`.
+
+## License ##
+See the [LICENSE](https://github.com/jhuang78/SimpleRest/blob/master/LICENSE) file for license rights and limitations (MIT).
