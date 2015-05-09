@@ -1,21 +1,15 @@
 package idv.jhuang78.simplerest;
 
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 
@@ -67,22 +61,6 @@ public class Config extends Application {
 		dispatcher.getDefaultContextObjects().put(Database.class, db);
 	
 		
-		/*final int backupInterval = Integer.parseInt(config.getProperty("srdb.db.backup.interval", "60000"));
-		new Thread(){
-			public @Override void run() {
-				try {
-					while(true) {
-						log.info("Backup database...");
-						ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(dbPath));
-						out.writeObject(db);
-						out.close();
-						Thread.sleep(backupInterval);						
-					}
-				} catch (InterruptedException | IOException e) {
-					log.error("Error backing up database. Stop backup.", e);
-				}
-			}
-		}.start();*/
 	}
 	
 	        

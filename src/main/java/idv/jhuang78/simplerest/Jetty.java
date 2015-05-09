@@ -1,9 +1,15 @@
 package idv.jhuang78.simplerest;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-public class Jetty {
+@Provider
+public class Jetty implements ExceptionMapper<WebApplicationException>{
     public static void main(String[] args) throws Exception {
     	WebAppContext context = new WebAppContext();
     	context.setDescriptor("./src/main/resources/web.xml");
@@ -16,4 +22,12 @@ public class Jetty {
     	server.start();
     	server.join();
     }
+
+	@Override
+	public Response toResponse(WebApplicationException e) {
+		return Response.fromResponse(e.getResponse()).entity(e.getMessage().toString()).build();
+				
+	}
+    
+    
 }

@@ -12,8 +12,9 @@
 	</context-param>
 	<context-param>
 		<param-name>resteasy.providers</param-name>
-		<param-value>idv.jhuang78.simplerest.Rest</param-value>
+		<param-value>idv.jhuang78.simplerest.Rest,idv.jhuang78.simplerest.Jetty</param-value>
 	</context-param>
+	
 	
 	
 	<listener>
