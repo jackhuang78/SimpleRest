@@ -1,9 +1,9 @@
 # SimpleRest #
 A minimal yet full-functional [REST](http://en.wikipedia.org/wiki/Representational_state_transfer) service built in Java with
 
-* [Jetty](http://eclipse.org/jetty/) as the servlet container
+* Embedded [Jetty](http://eclipse.org/jetty/) as the servlet container
 * [Resteasy](http://resteasy.jboss.org/) as the JAX-RX implementation
-* [java.util.Map](https://docs.oracle.com/javase/8/docs/api/java/util/Map.html) as the data store
+* [java.util.Map](https://docs.oracle.com/javase/8/docs/api/java/util/Map.html) as the data store and [java.io.Serializable](https://docs.oracle.com/javase/8/docs/api/index.html?java/util/concurrent/package-summary.html) for persistence on file system
 
 
 ## Purpose ##
@@ -22,7 +22,7 @@ Gradle will download all needed dependencies, build the project, then run it. An
     > curl -XGET localhost:9090/rest
     SimpleRestDb
 
-## REST API ##
+## The REST API ##
 
 Method | Path                    | Description                            | Request Body   | Response Body
 -------|-------------------------|----------------------------------------|----------------|--------------
