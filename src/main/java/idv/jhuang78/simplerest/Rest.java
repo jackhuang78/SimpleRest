@@ -16,11 +16,13 @@ import idv.jhuang78.simplerest.exception.ItemNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -33,6 +35,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -55,10 +58,19 @@ public class Rest implements ExceptionMapper<Exception> {
 	private static TypeReference<List<Item>> listItemType = new TypeReference<List<Item>>() {};
 	
 	
+	//================================================================================
+	//	REST Services
+	//================================================================================
 	
 	@GET @Path("/")
-	public Response status(@Context Database db) {
-		log.info("HTTP request GET /rest.");
+	public Response __(@Context HttpServletRequest req) {
+		return response(Status.SEE_OTHER, TEXT_PLAIN_TYPE, null, "/rest/status");
+	}
+	
+	@GET @Path("/status")
+	public Response status(@Context HttpServletRequest req, 
+			@Context Database db) {
+		request(req);
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("SimpleRest\n");
@@ -74,13 +86,13 @@ public class Rest implements ExceptionMapper<Exception> {
 	 * in the response. Also creates the collection if it did not exist previously.
 	 */
 	@POST @Path("/{collection}")
-	public Response create(
+	public Response create(@Context HttpServletRequest req,
 			@Context Database db,
 			@PathParam("collection") String collectionName,
 			String itemJson
 			) throws Exception {
 		
-		log.info("HTTP request POST /rest/{}.", collectionName);
+		request(req);
 		
 		Collection collection = db.getCollection(collectionName, true);
 		Item item = mapper.readValue(itemJson, Item.class);
@@ -95,7 +107,7 @@ public class Rest implements ExceptionMapper<Exception> {
 	 * with the same ID already exists.
 	 */
 	@POST @Path("/{collection}/{id}")
-	public Response create(
+	public Response create(@Context HttpServletRequest req,
 			@Context Database db,
 			@PathParam("collection") String collectionName,
 			@PathParam("id") int id,
@@ -106,9 +118,10 @@ public class Rest implements ExceptionMapper<Exception> {
 	}
 	
 	@GET @Path("/{collection}")
-	public Response read(@Context Database db,
+	public Response read(@Context HttpServletRequest req,
+			@Context Database db,
 			@PathParam("collection") String collectionName) throws Exception {
-		log.info("HTTP request GET /rest/{}.", collectionName);
+		request(req);
 		
 		Collection collection = db.getCollection(collectionName, false);
 		List<Item> items = new ArrayList<>(collection.values());
@@ -119,10 +132,11 @@ public class Rest implements ExceptionMapper<Exception> {
 	}
 	
 	@GET @Path("/{collection}/{id}")
-	public Response read(@Context Database db,
+	public Response read(@Context HttpServletRequest req,
+			@Context Database db,
 			@PathParam("collection") String collectionName,
 			@PathParam("id") int id) throws Exception {
-		log.info("HTTP request GET /rest/{}/{}.", collectionName);
+		request(req);
 		
 		Collection collection = db.getCollection(collectionName, false);
 		if(!collection.containsKey(id))
@@ -139,20 +153,22 @@ public class Rest implements ExceptionMapper<Exception> {
 	}
 	
 	@PUT @Path("/{collection}")
-	public Response update(@Context Database db,
+	public Response update(@Context HttpServletRequest req,
+			@Context Database db,
 			@PathParam("collection") String collectionName,
 			String itemsJson) throws Exception {
 		throw new NotImplementedYetException("PUT /rest/{collection}");
 	}
 	
 	@PUT @Path("/{collection}/{id}")
-	public Response update(@Context Database db,
+	public Response update(@Context HttpServletRequest req,
+			@Context Database db,
 			@PathParam("collection") String collectionName,
 			@PathParam("id") int id, 
 			@QueryParam("partial") @DefaultValue("false") boolean partial,	//TODO implement partial update
 			String itemJson) throws Exception {
 		
-		log.info("HTTP request PUT /rest/{}/{}.", collectionName, id);
+		request(req);
 		
 		Collection collection = db.getCollection(collectionName, true);
 		if(!collection.containsKey(id))
@@ -162,24 +178,28 @@ public class Rest implements ExceptionMapper<Exception> {
 		collection.add(id, item);
 		db.commit();
 		
-		return response(NO_CONTENT, TEXT_PLAIN_TYPE, null, "");
+		return response(NO_CONTENT, null, null, null);
 	}
 	
 	@DELETE @Path("/{collection}")
-	public Response delete(@Context Database db,
+	public Response delete(@Context HttpServletRequest req,
+			@Context Database db,
 			@PathParam("collection") String collectionName) throws Exception {
-		log.info("HTTP request DELETE /rest/{}.", collectionName);
+		
+		request(req);
+		
 		db.remove(collectionName);
 		db.commit();
-		return response(NO_CONTENT, TEXT_PLAIN_TYPE, null, "");
+		return response(NO_CONTENT, null, null, null);
 		
 	}
 	
 	@DELETE @Path("/{collection}/{id}")
-	public Response delete(@Context Database db,
+	public Response delete(@Context HttpServletRequest req,
+			@Context Database db,
 			@PathParam("collection") String collectionName,
 			@PathParam("id") int id) throws Exception {
-		log.info("HTTP request DELETE /rest/{}/{}.", collectionName, id);
+		request(req);
 		
 		Collection collection = db.getCollection(collectionName, false);
 		
@@ -189,9 +209,17 @@ public class Rest implements ExceptionMapper<Exception> {
 		collection.remove(id);
 		db.commit();
 		
-		return response(NO_CONTENT, TEXT_PLAIN_TYPE, null, "");
+		return response(NO_CONTENT, null, null, null);
 	}
 	
+	
+	//================================================================================
+	//	Helpers to Handle Request and Response
+	//================================================================================
+	private void request(HttpServletRequest req) {
+		String queryStr = (req.getQueryString() == null) ? "" : "?" + req.getQueryString();
+		log.info("HTTP request {} {}{}", req.getMethod(), req.getPathInfo(), queryStr);
+	}
 	
 	private Response response(Status status, MediaType type, Throwable error, String format, Object... args) {
 		
@@ -207,21 +235,37 @@ public class Rest implements ExceptionMapper<Exception> {
 		case CLIENT_ERROR: case SERVER_ERROR: 
 			ansiBegin = "\u001B[31m"; break;
 		}
+		log.info("HTTP response {}{}{} {}", ansiBegin, status.getStatusCode(), ansiReset, status.getReasonPhrase());
 		
-		log.info("HTTP response {}{}{} {}.", ansiBegin, status.getStatusCode(), ansiReset, status.getReasonPhrase());
 		
-		String message = String.format(format, args);
-		if(error != null) {
-			StringWriter writer = new StringWriter();
-			error.printStackTrace(new PrintWriter(writer));
-			message += "\n" + writer.toString();
+		ResponseBuilder rb = Response.status(status);
+		if(type != null)
+			rb.type(type);
+		
+		if(format != null) {
+			String message = String.format(format, args);
+			if(error != null) {
+				StringWriter writer = new StringWriter();
+				error.printStackTrace(new PrintWriter(writer));
+				message += "\n" + writer.toString();
+			}
+			
+			if(status.getFamily() == Status.Family.REDIRECTION)
+				rb.header("Location", message);
+			else
+				rb.entity(message);
 		}
+			
 		
-		return Response.status(status).type(type).entity(message).build();		
+		return rb.build();
+		
+		
+		
+				
 	}
 	
 	//================================================================================
-	//	Error Handling
+	//	Error Handler
 	//================================================================================
 
 	/**
