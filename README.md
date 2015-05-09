@@ -22,10 +22,11 @@ Gradle will download all needed dependencies, build the project, then run it. An
 Method | URL Format              | Description                            | Request Body | Response Body
 -------|-------------------------|----------------------------------------|--------------|--------------
 HEAD   | /rest/<collection>/<id> | Test if an item exists in a collection | *none*       | *none*
-POST   | /rest/<collection>      | Crean an item in a collection          | JSON object  | ID
+POST   | /rest/<collection>      | Crean an item in a collection          | JSON object OR JSON array of objects  | ID or IDs
 GET    | /rest/<collection>/<id> | Read an item from a collection         | *none*       | JSON object
-GET    | /rest/<collection>      | Read all items in a collection         | *none*       | JSON array
-PUT    | /rest/<collection>/<id> | Update an item in a collection         | JSON object  | *none*
+GET    | /rest/<collection>      | Read all items in a collection         | *none*       | JSON array of objects
+PUT    | /rest/<collection>/<id>?partial=[true&#124;false] | Update an item in a collection         | JSON object  | *none*
+PUT    | /rest/<collection>      | Update a collection with items         | JSON array of objects  | *none*
 DELETE | /rest/<collection>/<id> | Delete an item from a collection       | *none*       | *none*
 DELETE | /rest/<collection>      | Delete all items in a collection       | *none*       | *none*
 
